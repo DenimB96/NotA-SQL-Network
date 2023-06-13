@@ -1,22 +1,18 @@
-const express = require('express');
-const mongoose = require('mongoose');
+const express = require("express");
+const mongodb = require("./config/connection");
+const router = require("./routes");
 
-const app = express();
 const PORT = process.env.PORT || 3001;
 
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
 
-app.use(require('./routes'));
+app.use("/", router);
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/18-NoSQL-Social-Network-API', {
-  useFindAndModify: false,
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+mongodb.once("open", () => {
+  console.log("mongodbconnected");
+  app.listen(PORT, () => {
+    console.log(`serlistening - http://localhost:${PORT}`);
+  });
 });
-
-// Use this to log mongo queries being executed!
-mongoose.set('debug', true);
-
-app.listen(PORT, () => console.log(`🌍 Connected on localhost:${PORT}`));
